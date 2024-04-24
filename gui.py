@@ -10,10 +10,13 @@ list_box = sg.Listbox(values=functions.get_todos(), key='todos_listbox',
                       enable_events=True, size=(45, 10))  # this shows the todos list from the todo.txt file
 
 edit_button = sg.Button("Edit")
+complete_button = sg.Button("Complete")
+exit_button = sg.Button("Exit")
 
 layout = [[label],
           [input_box, add_button],
-          [list_box, edit_button]]
+          [list_box, edit_button, complete_button],
+          [exit_button]]
 
 window = sg.Window('My To-Do App',
                    layout=layout,
@@ -24,6 +27,7 @@ while True:
     print(2, values)    # This shows the values being transformed or added to the todolist
     # remember the values are a dictionary. so the first part 'name' is the key. next part is the data. 'key': datatype
     print(3, values['todos_listbox'])
+    print(4, values['todos_listbox'][0])
 
     match event:
         case "Add":
@@ -46,10 +50,19 @@ while True:
 
             window['todos_listbox'].update(values=todos)  # this updates the listbox to reflect the changes
 
+        case "Complete":
+            todo_to_complete = values['todos_listbox'][0]  # extracting str from list
+            todos = functions.get_todos()  # Get the todo list from txt.
+            todos.remove(todo_to_complete)  # remove method requires data not list type so use extracted str
+            functions.write_todos(todos)   # rewrite after removing todo because it wont keep the update.
+            window['todos_listbox'].update(values=todos)  # show removal of todo in real time.
+
         case 'todos_listbox':  # this places the listbox todo value selected by the user in the input box
             window['todo_input_box'].update(value=values['todos_listbox'][0])
 
+        case 'Exit':
+            break
         case sg.WIN_CLOSED:
             break
-
+print("Bye")
 window.close()
